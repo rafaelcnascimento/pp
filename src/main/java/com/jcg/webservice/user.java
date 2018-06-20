@@ -3,12 +3,9 @@ package com.jcg.webservice;
 import java.util.Scanner;
 
     import java.sql.Connection;
-    import java.sql.DriverManager;
-    import java.sql.PreparedStatement;
     import java.sql.ResultSet;
     import java.sql.SQLException;
-    import java.util.logging.Level;
-    import java.util.logging.Logger;
+    import java.sql.PreparedStatement;  
 
 public class user {
     
@@ -19,7 +16,7 @@ public class user {
     public static float balanco;
     public static String senha;
     
-    /*public user (String email) throws SQLException {
+    public user (String email) throws SQLException {
         
         db DB = new db();
         Connection conn = DB.conn;
@@ -38,23 +35,17 @@ public class user {
             user.cc = rs.getString("cc");
             user.balanco = rs.getFloat("balanco");
         }
-    }*/
+    }
     
-    public static boolean cadastro( String nome, String email, String cc, String senha) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-            
-            Connection con = null;
-            
-            String url = "jdbc:mysql://localhost:3306/pagpal";
-            String user = "root";
-            String password = "";
-  
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-            con = DriverManager.getConnection(url, user, password);
-            
-                    
+    public static boolean cadastro( String nome, String email, String cc, String senha) throws SQLException {
+        
+    	db DB = new db();
+    	
+        	Connection conn = DB.conn;
+        
             String sql = "INSERT INTO users(nome,email,cc,senha) VALUES(?,?,?,?)";  
           
-            PreparedStatement stmt = con.prepareStatement(sql);  
+            PreparedStatement stmt = conn.prepareStatement(sql);  
             stmt.setString(1, nome);  
             stmt.setString(2, email);  
             stmt.setString(3, cc);  

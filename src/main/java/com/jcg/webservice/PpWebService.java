@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -75,21 +73,13 @@ public class PpWebService {
 		String senha = jason.getString("senha");
 		
 		
-            try {
-                if (user.cadastro(nome,email,cc,senha)) {
-                    return Response.status(200).entity(crunchifyBuilder.toString()).build();
-                } else {
-                    return Response.status(500).build();
-                }
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(PpWebService.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InstantiationException ex) {
-                Logger.getLogger(PpWebService.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(PpWebService.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return null;
-			
+		if (user.cadastro(nome,email,cc,senha)) {
+			return Response.status(200).entity(crunchifyBuilder.toString()).build();
+		} else {
+			return Response.status(500).build();
+		}
+		
+		
 	}
 }
 	
