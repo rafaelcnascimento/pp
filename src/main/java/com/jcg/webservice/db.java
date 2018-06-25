@@ -1,5 +1,8 @@
 	package com.jcg.webservice;
     
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
     import java.sql.Connection;
     import java.sql.DriverManager;
     import java.sql.PreparedStatement;
@@ -8,6 +11,7 @@
     import java.util.Scanner;
     import java.util.logging.Level;
     import java.util.logging.Logger;
+import org.json.JSONObject;
 
 
     public class db{
@@ -36,6 +40,23 @@
         }
 
         return conn;
+    }
+    
+    public static String receberJson(InputStream incomingData){
+        
+        StringBuilder crunchifyBuilder = new StringBuilder();
+        
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(incomingData));
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                crunchifyBuilder.append(line);
+            }
+        } catch (Exception e) {
+            System.out.println("Error Parsing: - ");
+        }
+
+        return crunchifyBuilder.toString();
     }
 }
 

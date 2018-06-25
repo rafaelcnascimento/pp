@@ -3,61 +3,74 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
+
 
 public class dinheiro {
+
+    public static String transferir(String remetente, String destinatario, Float quantidade) throws SQLException{
+        
+        String sql;
+
+        Connection conn = db.conectar();
+        
+            try {
+            sql = "UPDATE users SET balanco = balanco + ? WHERE email = ?";
+
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setFloat(1, quantidade);
+            stmt.setString(2, destinatario);
+            int resultado = stmt.executeUpdate();
+            
+            if(resultado == 0){
+                throw new SQLException("Destinatario inexistente");
+            }
+            
+            sql = "UPDATE users SET balanco = balanco - ? WHERE email = ?";
+
+            stmt = conn.prepareStatement(sql);
+            stmt.setFloat(1, quantidade);
+            stmt.setString(2, remetente);
+            stmt.execute();
+            
+            sql = "UPDATE users SET balanco = balanco - ? WHERE email = ?";
+
+            stmt = conn.prepareStatement(sql);
+            stmt.setFloat(1, quantidade);
+            stmt.setString(2, remetente);
+            stmt.execute();
+
+            return "ok";
+
+            } catch (SQLException e) {
+              return e.getMessage();
+            }
+        //}
+    }
     
-    @SuppressWarnings("static-access")
-//    public static void enviar(user usuario, db DB) throws SQLException{
-//        
-//        float quantidade;
-//        String  destinatario;
-//
-//        Scanner scan = new Scanner(System.in);
-//
-//        System.out.println("\nSeu balanço: R$"+usuario.balanco);
-//        System.out.println("Digite a quantidade a ser enviada:");
-//        quantidade = scan.nextFloat();
-//
-//        if (quantidade > usuario.balanco) {
-//            System.err.println("Fundos insuficientes");
-//        }
-//
-//        System.out.println("Informe o email do destinatário:");
-//        scan.nextLine();
-//        destinatario = scan.nextLine();
-//
-//        ResultSet rs = DB.checkDestinatario(destinatario);
-//
-//        if (!rs.next()) {
-//            System.out.println("Destinatário inexistente");
-//        } else {
-//             
-//            DB.updateBalanco(quantidade, destinatario, 1);
-//
-//            usuario.balanco = usuario.balanco - quantidade;
-//            
-//            DB.updateBalanco(quantidade, usuario.email, 0);
-//            
-//            DB.setPagamentos(usuario.id, DB.getId(destinatario), quantidade);
-//            
-//            System.out.println("\nTransação efetuada com sucesso");
-//            System.out.println("O seu novo balanço é de: R$"+usuario.balanco);
-//        }
-//    }
-//    
-    public static String depositar(String email, float quantidade) throws SQLException {
+    public static String depositar(String email,int id, float quantidade) throws SQLException {
         
         String sql = "UPDATE users SET balanco = balanco + ? WHERE email = ?";
 
         Connection conn = db.conectar();
-        
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setFloat(1, quantidade);
-        stmt.setString(2, email);
-        
+         
         try {
+            
+            
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setFloat(1, quantidade);
+            stmt.setString(2, email);
+            
             stmt.execute();
+            
+            sql = "INSERT INTO historico(sender_id,receiver_id,valor) VALUES(?,?,?)";
+            
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            stmt.setInt(2, id);
+            stmt.setFloat(3, quantidade);
+            
+            stmt.execute();
+            
             return "ok";
         } catch (SQLException e) {
           return e.getMessage();

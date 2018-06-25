@@ -1,14 +1,9 @@
 package com.jcg.webservice;
 
-import java.util.Scanner;
-
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -81,7 +76,6 @@ public class user {
             resposta.put("cc", rs.getString("cc")); 
             resposta.put("senha", rs.getString("senha")); 
             resposta.put("balanco", rs.getFloat("balanco")); 
-            
         }
            
         return resposta;
