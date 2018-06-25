@@ -31,7 +31,7 @@ public class PpWebService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response cadastro(InputStream incomingData) throws JSONException, SQLException {
                 
-            JSONObject jason = new JSONObject(db.receberJson(incomingData));
+            JSONObject jason = new JSONObject(dbWeb.receberJson(incomingData));
 
             String nome = jason.getString("nome");
             String email = jason.getString("email");
@@ -39,7 +39,7 @@ public class PpWebService {
             String senha = jason.getString("senha");
 		
             try {
-                if (user.cadastro(nome,email,cc,senha)) {
+                if (userWeb.cadastro(nome,email,cc,senha)) {
                     return Response.status(200).entity("Cadastro efetuado com sucesso").build();
                 } else {
                     return Response.status(200).entity("Erro no cadastro").build();
@@ -60,17 +60,21 @@ public class PpWebService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response login(InputStream incomingData) throws JSONException, SQLException {            
             
-            JSONObject jason = new JSONObject(db.receberJson(incomingData));
+            JSONObject jason = new JSONObject(dbWeb.receberJson(incomingData));
 
             String email = jason.getString("email");
             String senha = jason.getString("senha");
 
             JSONObject resposta = new JSONObject();
 
-            resposta = user.login(email, senha);
-
-            return Response.status(200).entity(resposta.toString()).build();
-                	
+            resposta = userWeb.login(email, senha);
+            
+            if (resposta.getBoolean("ativo")) {
+                return Response.status(200).entity(resposta.toString()).build();
+            } else {
+                return Response.status(200).entity("{}").build();
+            }
+            
 	}
         
         @POST
@@ -78,14 +82,13 @@ public class PpWebService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response depositar(InputStream incomingData) throws JSONException, SQLException {
             
-            JSONObject jason = new JSONObject(db.receberJson(incomingData));
+            JSONObject jason = new JSONObject(dbWeb.receberJson(incomingData));
 		
             int id = jason.getInt("id");
             String email = jason.getString("email");
             float quantidade = Float.parseFloat(jason.getString("quantidade"));
             
-            return Response.status(200).entity(dinheiro.depositar(email,id,quantidade)).build();
-       
+            return Response.status(200).entity(dinheiroWeb.depositar(email,id,quantidade)).build();
         }
         
         @POST
@@ -93,17 +96,67 @@ public class PpWebService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response transferir(InputStream incomingData) throws JSONException, SQLException {
             
-            JSONObject jason = new JSONObject(db.receberJson(incomingData));
+            JSONObject jason = new JSONObject(dbWeb.receberJson(incomingData));
             
             int sender_id = jason.getInt("id");
             String remetente = jason.getString("remetente");
             String destinatario = jason.getString("destinatario");
             float quantidade = Float.parseFloat(jason.getString("quantidade"));
             
-            return Response.status(200).entity(dinheiro.transferir(remetente,sender_id,destinatario,quantidade)).build();
+            return Response.status(200).entity(dinheiroWeb.transferir(remetente,sender_id,destinatario,quantidade)).build();
        
         }
-}
-	
+        
+        @POST
+        @Path("/historico")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response historico(InputStream incomingData) throws JSONException, SQLException {            
+            
+            JSONObject jason = new JSONObject(dbWeb.receberJson(incomingData));
 
+            int id = jason.getInt("id");
+            
+            JSONArray resposta = new JSONArray();
+            
+            resposta = dinheiroWeb.historico(id);
+            
+            return Response.status(200).entity(resposta.toString()).build();
+                	
+	}
+        
+        @POST
+        @Path("/remover")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response remover(InputStream incomingData) throws JSONException, SQLException {            
+            
+            JSONObject jason = new JSONObject(dbWeb.receberJson(incomingData));
+
+            int id = jason.getInt("id");
+          
+            if (userWeb.remover(id)) {
+                return Response.status(200).entity("ok").build();
+            } else {
+                return Response.status(200).entity("not ok").build();    
+            }
+           	
+	}
+        
+	@POST
+        @Path("/editar")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response editar(InputStream incomingData) throws JSONException, SQLException {            
+            
+            JSONObject jason = new JSONObject(dbWeb.receberJson(incomingData));
+
+            String nome = jason.getString("nome");
+            String email = jason.getString("email");
+            String cc = jason.getString("cc");
+            String senha = jason.getString("senha");
+
+            JSONObject resposta = new JSONObject();
+
+            return Response.status(200).entity(userWeb.editar(nome,email,cc,senha)).build();
+            
+	}
+}
 

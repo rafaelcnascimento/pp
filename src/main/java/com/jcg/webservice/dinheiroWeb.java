@@ -3,15 +3,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
-public class dinheiro {
+public class dinheiroWeb {
 
     public static String transferir(String remetente,int sender_id, String destinatario, Float quantidade) throws SQLException{
         
         String sql;
 
-        Connection conn = db.conectar();
+        Connection conn = dbWeb.conectar();
         
         try {
             sql = "UPDATE users SET balanco = balanco + ? WHERE email = ?";
@@ -25,7 +28,7 @@ public class dinheiro {
                 throw new SQLException("Destinatario inexistente");
             }
             
-            int receiver_id = db.getId(destinatario);
+            int receiver_id = dbWeb.getId(destinatario);
             
             sql = "UPDATE users SET balanco = balanco - ? WHERE email = ?";
 
@@ -62,7 +65,7 @@ public class dinheiro {
         
         String sql = "UPDATE users SET balanco = balanco + ? WHERE email = ?";
 
-        Connection conn = db.conectar();
+        Connection conn = dbWeb.conectar();
          
         try {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -82,27 +85,42 @@ public class dinheiro {
             
             return "ok";
         } catch (SQLException e) {
-          return e.getMessage();
+          return e.getMessage();   
+        }
+    }
         
-     }
-
-//    public static void historico(user usuario, db DB) throws SQLException {
-//        
-//        Scanner scan = new Scanner(System.in);
-//        
-//        Connection conn = DB.conn;
-//        
-//        String sql = "SELECT p.id,u1.nome as sender,u2.nome as receiver ,p.valor,p.data \n" +
-//                     "FROM pagamentos p\n" +
-//                     "INNER JOIN users u1 on u1.id = p.sender_id\n" +
-//                     "INNER JOIN users u2 on u2.id = p.receiver_id\n" +
-//                     "WHERE sender_id = ? OR receiver_id = ?";  
-//          
-//        PreparedStatement stmt = conn.prepareStatement(sql);  
-//        stmt.setInt(1, usuario.id);  
-//        stmt.setInt(2, usuario.id); 
-//        ResultSet rs  = stmt.executeQuery();
-//        
+    public static JSONArray historico(int id) throws SQLException, JSONException {
+        
+        JSONArray resposta = new JSONArray();
+        
+        Connection conn = dbWeb.conectar();
+        
+        String sql = "SELECT p.id,u1.nome as sender,u2.nome as receiver ,p.valor,p.data \n" +
+                     "FROM historico p\n" +
+                     "INNER JOIN users u1 on u1.id = p.sender_id\n" +
+                     "INNER JOIN users u2 on u2.id = p.receiver_id\n" +
+                     "WHERE sender_id = ? OR receiver_id = ?\n" +
+                     "ORDER BY p.id DESC";  
+          
+        PreparedStatement stmt = conn.prepareStatement(sql);  
+        stmt.setInt(1, id);  
+        stmt.setInt(2, id); 
+        ResultSet rs  = stmt.executeQuery();
+        
+        while (rs.next()) {
+            JSONObject jason = new JSONObject();
+            
+            jason.put("id", rs.getInt("id"));
+            jason.put("sender", rs.getString("sender"));
+            jason.put("receiver", rs.getString("receiver"));
+            jason.put("valor", Float.toString(rs.getFloat("valor")));
+            jason.put("data", rs.getString("data"));
+            
+            resposta.put(jason);
+        }
+        
+        return resposta;
+    }
 //        while (rs.next()) {
 //            System.out.println("------------------------------");
 //            System.out.println("ID= "+ rs.getInt("id"));
@@ -125,8 +143,7 @@ public class dinheiro {
 //        System.out.println("------------------------------");
 //        
 //        System.out.println("Pressione enter para continuar...");
-//        scan.nextLine();
-//    }
+//        scan.nextLine()
 //    
 //    public static void solicitacoes(user usuario, db DB) throws SQLException {
 //        
@@ -206,5 +223,4 @@ public class dinheiro {
 //            System.out.println("------------------------------");
 //       }
 //    }
-}
 }
