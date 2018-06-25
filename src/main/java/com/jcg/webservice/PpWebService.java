@@ -95,11 +95,12 @@ public class PpWebService {
             
             JSONObject jason = new JSONObject(db.receberJson(incomingData));
             
+            int sender_id = jason.getInt("id");
             String remetente = jason.getString("remetente");
             String destinatario = jason.getString("destinatario");
             float quantidade = Float.parseFloat(jason.getString("quantidade"));
             
-            return Response.status(200).entity(dinheiro.transferir(remetente,destinatario,quantidade)).build();
+            return Response.status(200).entity(dinheiro.transferir(remetente,sender_id,destinatario,quantidade)).build();
        
         }
 }

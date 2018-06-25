@@ -58,8 +58,6 @@ import org.json.JSONObject;
 
         return crunchifyBuilder.toString();
     }
-}
-
 //   public String DB_URL = "jdbc:mysql://localhost/pagpal";
 //   public String USER = "root";
 //   public String PASS = "";
@@ -71,23 +69,23 @@ import org.json.JSONObject;
 //	   this.conn = DriverManager.getConnection(DB_URL, USER, PASS);
 //   }
 //     
-//   public int getId(String email) throws SQLException{
-//        
-//       int id = 0;
-//       
-//       conn = DriverManager.getConnection(DB_URL, USER, PASS);
-//    
-//       String sql = "SELECT id FROM users WHERE email = ?";
-//        
-//       PreparedStatement stmt = conn.prepareStatement(sql);  
-//       stmt.setString(1, email);  
-//        
-//       ResultSet rs = stmt.executeQuery();
-//       while (rs.next()) {
-//          id = rs.getInt("id");
-//       }
-//       return id;
-//   }
+   public static int getId(String email) throws SQLException{
+        
+       int id = 0;
+       
+       Connection conn = db.conectar();
+    
+       String sql = "SELECT id FROM users WHERE email = ?";
+        
+       PreparedStatement stmt = conn.prepareStatement(sql);  
+       stmt.setString(1, email);  
+        
+       ResultSet rs = stmt.executeQuery();
+       while (rs.next()) {
+          id = rs.getInt("id");
+       }
+       return id;
+   }
 //   
 //   public void updateBalanco(Float quantidade, String email,int tipo) throws SQLException{
 //          
@@ -219,6 +217,6 @@ import org.json.JSONObject;
 //                break;
 //       }
 //   }
-//}
-//
-//
+}
+
+

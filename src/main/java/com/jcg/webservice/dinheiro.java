@@ -7,13 +7,13 @@ import java.sql.SQLException;
 
 public class dinheiro {
 
-    public static String transferir(String remetente, String destinatario, Float quantidade) throws SQLException{
+    public static String transferir(String remetente,int sender_id, String destinatario, Float quantidade) throws SQLException{
         
         String sql;
 
         Connection conn = db.conectar();
         
-            try {
+        try {
             sql = "UPDATE users SET balanco = balanco + ? WHERE email = ?";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -24,6 +24,8 @@ public class dinheiro {
             if(resultado == 0){
                 throw new SQLException("Destinatario inexistente");
             }
+            
+            int receiver_id = db.getId(destinatario);
             
             sql = "UPDATE users SET balanco = balanco - ? WHERE email = ?";
 
@@ -37,6 +39,15 @@ public class dinheiro {
             stmt = conn.prepareStatement(sql);
             stmt.setFloat(1, quantidade);
             stmt.setString(2, remetente);
+            stmt.execute();
+            
+            sql = "INSERT INTO historico(sender_id,receiver_id,valor) VALUES(?,?,?)";
+            
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, sender_id);
+            stmt.setInt(2, receiver_id);
+            stmt.setFloat(3, quantidade);
+            
             stmt.execute();
 
             return "ok";
@@ -54,8 +65,6 @@ public class dinheiro {
         Connection conn = db.conectar();
          
         try {
-            
-            
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setFloat(1, quantidade);
             stmt.setString(2, email);
@@ -77,37 +86,6 @@ public class dinheiro {
         
      }
 
-//    
-//    public static void solicitar(user usuario,db DB) throws SQLException {
-//        
-//        float quantidade;
-//        String  destinatario;
-//        String mensagem;
-//
-//        Scanner scan = new Scanner(System.in);
-//
-//        System.out.println("\nSeu balanço: R$"+usuario.balanco);
-//        System.out.println("Digite a quantidade a ser solicitada:");
-//        quantidade = scan.nextFloat();
-//
-//        System.out.println("Informe o email do destinatário:");
-//        scan.nextLine();
-//        destinatario = scan.nextLine();
-//
-//        ResultSet rs = DB.checkDestinatario(destinatario);
-//
-//        if (!rs.next()) {
-//            System.out.println("Destinatário inexistente");
-//        } else {
-//            System.out.println("Digite uma mensagem para o destinatário:");
-//            mensagem = scan.nextLine();
-//            
-//            DB.setOrdens(usuario.id, DB.getId(destinatario), quantidade, mensagem, 1);
-//
-//            System.out.println("\nSolicitação efetuada com sucesso");
-//        }
-//    }
-//    
 //    public static void historico(user usuario, db DB) throws SQLException {
 //        
 //        Scanner scan = new Scanner(System.in);
